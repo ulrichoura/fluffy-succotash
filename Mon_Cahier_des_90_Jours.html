@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Mon Cahier des 90 Jours — Solvix</title>
+<style>
+  :root{
+    --navy:#1B2A4A; --gold:#B8892B; --cream:#FAF7F2; --gray:#3A3A3A;
+    --beige:#EFE6D8; --green:#2E7D46;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--cream); color:var(--gray);
+    font-family:'Segoe UI', -apple-system, Roboto, Arial, sans-serif;
+    padding-bottom:50px;
+  }
+  header{
+    background:var(--navy); color:var(--cream); padding:24px 18px 20px 18px;
+    text-align:center; position:sticky; top:0; z-index:10;
+  }
+  header h1{ font-size:18px; margin:0 0 3px 0; font-weight:700; }
+  header p{ font-size:11px; margin:0; color:var(--gold); letter-spacing:0.5px; }
+
+  .progress-wrap{ max-width:520px; margin:14px auto 0 auto; padding:0 18px; }
+  .progress-label{ display:flex; justify-content:space-between; font-size:11.5px; color:var(--navy); font-weight:700; margin-bottom:5px;}
+  .progress-bar-bg{ background:#E7DFCC; border-radius:20px; height:10px; overflow:hidden;}
+  .progress-bar-fill{ background:var(--gold); height:100%; border-radius:20px; transition:width 0.3s; width:0%;}
+
+  .container{ max-width:520px; margin:0 auto; padding:0 14px; }
+
+  .week-card{
+    background:#fff; border-radius:12px; padding:16px; margin:16px 0;
+    box-shadow:0 1px 6px rgba(0,0,0,0.07); border-left:4px solid var(--gold);
+  }
+  .week-card.done{ border-left-color:var(--green); }
+  .week-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;}
+  .week-num{ font-size:10.5px; color:var(--gold); font-weight:700; text-transform:uppercase; letter-spacing:0.5px;}
+  .week-title{ font-size:15px; color:var(--navy); font-weight:700; margin:2px 0 12px 0;}
+
+  .item{ display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px solid #F2EEE3;}
+  .item:last-child{ border-bottom:none; }
+  .item input[type=checkbox]{
+    width:20px; height:20px; margin-top:1px; accent-color:var(--gold); flex-shrink:0;
+  }
+  .item label{ font-size:13.5px; line-height:1.4; color:var(--gray); }
+  .item.checked label{ text-decoration:line-through; color:#B7B0A0; }
+
+  .fuite-box{
+    background:var(--beige); border-radius:10px; padding:12px; margin-top:12px;
+  }
+  .fuite-box-title{ font-size:12px; font-weight:700; color:var(--navy); margin-bottom:8px; }
+  .fuite-item{ display:flex; align-items:center; gap:8px; padding:5px 0; }
+  .fuite-item input[type=checkbox]{ width:17px; height:17px; accent-color:var(--gold); flex-shrink:0;}
+  .fuite-item label{ font-size:12px; flex:1; color:var(--gray); }
+  .fuite-item input[type=number]{
+    width:75px; border:1px solid #DCD3BE; border-radius:6px; padding:5px; font-size:12px; text-align:right;
+  }
+  .fuite-total{ display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; color:var(--navy); margin-top:8px; padding-top:8px; border-top:1px dashed #DCD3BE;}
+
+  .badge{ display:inline-block; padding:3px 11px; border-radius:20px; font-size:10.5px; font-weight:700; margin-top:10px;}
+  .badge.cours{ background:#FDECC8; color:#8A5A00;}
+  .badge.done{ background:#DCF3E3; color:var(--green);}
+
+  .instructions{
+    background:var(--navy); color:var(--cream); border-radius:12px; padding:20px 18px; margin:26px 0 14px 0;
+  }
+  .instructions h2{ font-size:14px; color:var(--gold); margin:0 0 12px 0; text-transform:uppercase; letter-spacing:0.5px;}
+  .instructions ol{ margin:0; padding-left:18px; }
+  .instructions li{ font-size:13px; line-height:1.6; margin-bottom:9px; }
+  .instructions p.note{ font-size:11.5px; color:var(--gold); margin-top:12px; font-style:italic;}
+
+  footer{ text-align:center; padding:20px; font-size:10px; color:var(--gold); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Mon Cahier des 90 Jours</h1>
+  <p>SOLVIX — SORTIR DES DETTES EN 90 JOURS</p>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-label"><span id="progressText">0 / 0 actions faites</span><span id="progressPct">0%</span></div>
+  <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+</div>
+
+<div class="container" id="weeksContainer"></div>
+
+<div class="container">
+  <div class="instructions">
+    <h2>Mode d'emploi</h2>
+    <ol>
+      <li>Chaque semaine correspond à un bloc de ce cahier. Cochez chaque action au fur et à mesure que vous la faites — pas besoin de tout faire le même jour.</li>
+      <li>Ne sautez pas une semaine même si vous êtes en retard : reprenez simplement là où vous en êtes, à votre rythme.</li>
+      <li>Aux semaines 4, 8 et 12, remplissez la petite Checklist des Fuites — ça prend 5 minutes et ça vous montre où va votre argent ce mois-ci.</li>
+      <li>Vos coches restent enregistrées automatiquement sur ce téléphone, même si vous fermez la page.</li>
+      <li>Le principal, ce n'est pas d'aller vite. C'est de ne pas abandonner.</li>
+    </ol>
+    <p class="note">Pensez à faire une capture d'écran de temps en temps, pour garder une trace de votre progression.</p>
+  </div>
+</div>
+
+<footer>Sortir des Dettes en 90 Jours — Solvix</footer>
+
+<script>
+const FUITES = [
+  "Achat impulsif non prévu",
+  "Abonnement payé mais non utilisé",
+  "Nouveau crédit pris pour rembourser un autre",
+  "Sortie plus coûteuse que prévu",
+  "Pari ou jeu d'argent",
+  "Avance sur salaire demandée",
+  "Achat « pour impressionner »",
+  "Dépense faite pour soulager un stress",
+  "Argent prêté à un proche, non prévu",
+  "Frais bancaires ou pénalité évitable",
+  "Achat à crédit inutile",
+  "Livraison ou fast-food au lieu de cuisiner",
+  "Transport évitable",
+  "Cadeau ou dépense sociale non budgétée"
+];
+
+const WEEKS = [
+  { num:1, title:"Faire le point", items:[
+    "Lister toutes mes dettes (créancier, montant, échéance)",
+    "Lister tous mes revenus, y compris les revenus variables",
+    "Noter toutes mes dépenses pendant une semaine"
+  ]},
+  { num:2, title:"Choisir ma méthode", items:[
+    "Classer mes dettes par taux (méthode Avalanche)",
+    "Classer mes dettes par montant (méthode Boule de neige)",
+    "Choisir la méthode que je vais suivre"
+  ]},
+  { num:3, title:"Passer à l'attaque", items:[
+    "Identifier ma dette prioritaire",
+    "Définir le montant que je vais y consacrer ce mois-ci",
+    "Repérer les 2-3 erreurs du livre dans lesquelles je me reconnais"
+  ]},
+  { num:4, title:"Construire mon budget", items:[
+    "Répartir mon salaire par catégories avant de le recevoir",
+    "Mettre de côté une ligne pour les dépenses non mensuelles",
+    "Remplir la Checklist des Fuites du mois (ci-dessous)"
+  ], fuite:true},
+  { num:5, title:"Explorer le digital", items:[
+    "Lire pourquoi le digital est adapté à mon emploi du temps",
+    "Identifier combien d'heures par semaine je peux dégager",
+    "Regarder les 3 pistes digitales proposées dans le livre"
+  ]},
+  { num:6, title:"Choisir mon activité", items:[
+    "Choisir la piste digitale qui me correspond le mieux",
+    "Me renseigner sur cette piste, sans encore investir",
+    "Identifier mes 3 créneaux disponibles dans la semaine"
+  ]},
+  { num:7, title:"Me lancer", items:[
+    "Investir un premier petit montant, si je suis prêt",
+    "Préparer ce que je vais présenter à mon entourage",
+    "Continuer à rembourser ma dette prioritaire"
+  ]},
+  { num:8, title:"Présenter mon activité", items:[
+    "Présenter mon activité à mon entourage proche",
+    "Noter mes premiers retours, même petits",
+    "Remplir la Checklist des Fuites du mois (ci-dessous)"
+  ], fuite:true},
+  { num:9, title:"Élargir", items:[
+    "Présenter mon activité plus largement",
+    "Ajuster ce qui fonctionne, arrêter ce qui ne marche pas",
+    "Vérifier l'avancement de ma dette prioritaire"
+  ]},
+  { num:10, title:"Sécuriser", items:[
+    "Ouvrir ou choisir un espace pour mon fonds d'urgence",
+    "Mettre de côté un premier petit montant, même 2000 FCFA",
+    "Mettre à jour mon tableau de remboursement des dettes"
+  ]},
+  { num:11, title:"Ancrer mes habitudes", items:[
+    "Mettre en place une épargne automatique dès le salaire",
+    "Me fixer un objectif financier clair pour les 3 prochains mois",
+    "Refuser un emprunt non essentiel cette semaine, si la situation se présente"
+  ]},
+  { num:12, title:"Faire le bilan", items:[
+    "Comparer ma situation à celle du premier jour",
+    "Remplir la Checklist des Fuites du mois (ci-dessous)",
+    "Décider de mes 3 prochains objectifs après ces 90 jours"
+  ], fuite:true},
+];
+
+let state = {};
+
+function loadState(){
+  try{
+    const s = localStorage.getItem('solvix_cahier90_v1');
+    if(s) state = JSON.parse(s);
+  }catch(e){ state = {}; }
+}
+function saveState(){
+  try{ localStorage.setItem('solvix_cahier90_v1', JSON.stringify(state)); }catch(e){}
+}
+
+function itemKey(w,i){ return 'w'+w+'_i'+i; }
+function fuiteCheckKey(w,i){ return 'w'+w+'_f'+i+'_c'; }
+function fuiteAmountKey(w,i){ return 'w'+w+'_f'+i+'_a'; }
+
+function toggleItem(w,i){
+  const k = itemKey(w,i);
+  state[k] = !state[k];
+  saveState(); render();
+}
+function toggleFuite(w,i){
+  const k = fuiteCheckKey(w,i);
+  state[k] = !state[k];
+  saveState(); render();
+}
+function updateFuiteAmount(w,i,val){
+  state[fuiteAmountKey(w,i)] = val;
+  saveState();
+}
+
+function render(){
+  const container = document.getElementById('weeksContainer');
+  let totalItems = 0, doneItems = 0;
+
+  container.innerHTML = WEEKS.map(w=>{
+    const itemsHtml = w.items.map((txt,i)=>{
+      totalItems++;
+      const checked = !!state[itemKey(w.num,i)];
+      if(checked) doneItems++;
+      return `
+      <div class="item ${checked?'checked':''}">
+        <input type="checkbox" id="chk_${w.num}_${i}" ${checked?'checked':''} onchange="toggleItem(${w.num},${i})">
+        <label for="chk_${w.num}_${i}">${txt}</label>
+      </div>`;
+    }).join('');
+
+    let fuiteHtml = '';
+    if(w.fuite){
+      let total = 0;
+      const fItems = FUITES.map((f,i)=>{
+        const checked = !!state[fuiteCheckKey(w.num,i)];
+        const amount = state[fuiteAmountKey(w.num,i)] || '';
+        if(checked) total += Number(amount||0);
+        return `
+        <div class="fuite-item">
+          <input type="checkbox" ${checked?'checked':''} onchange="toggleFuite(${w.num},${i})">
+          <label>${f}</label>
+          <input type="number" placeholder="FCFA" value="${amount}" oninput="updateFuiteAmount(${w.num},${i},this.value)">
+        </div>`;
+      }).join('');
+      fuiteHtml = `
+      <div class="fuite-box">
+        <div class="fuite-box-title">📋 Checklist des Fuites du mois</div>
+        ${fItems}
+        <div class="fuite-total"><span>Total estimé</span><span>${total.toLocaleString('fr-FR')} FCFA</span></div>
+      </div>`;
+    }
+
+    const weekDone = w.items.every((_,i)=>state[itemKey(w.num,i)]);
+
+    return `
+    <div class="week-card ${weekDone?'done':''}">
+      <div class="week-head"><span class="week-num">Semaine ${w.num}</span></div>
+      <div class="week-title">${w.title}</div>
+      ${itemsHtml}
+      ${fuiteHtml}
+      <span class="badge ${weekDone?'done':'cours'}">${weekDone?'Semaine terminée ✓':'En cours'}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('progressText').textContent = doneItems + ' / ' + totalItems + ' actions faites';
+  const pct = totalItems>0 ? Math.round((doneItems/totalItems)*100) : 0;
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+loadState();
+render();
+</script>
+
+</body>
+</html>
